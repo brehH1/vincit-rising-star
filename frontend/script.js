@@ -34,7 +34,7 @@ async function loadData() {
     const s = document.getElementById("start").value;
     const e = document.getElementById("end").value;
 
-    const r = await fetch(`http://localhost:8000/analyze?start=${s}&end=${e}`);
+    const r = await fetch(`https://vincit-rising-star-production.up.railway.app/analyze?start=${s}&end=${e}`);
     const d = await r.json();
 
     document.getElementById("statsBox").textContent =
