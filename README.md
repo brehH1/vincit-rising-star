@@ -1,4 +1,4 @@
-# Bitcoin-analyysisovellus
+# Bitcoin-analyysiohjelma
 
 Tämä sovellus hakee Bitcoinin markkinadataa CoinGeckosta ja näyttää sen verkkosivuna, jossa on diagrammeja ja tilastoja. Käyttäjä voi valita päivämäärävälin, jonka perusteella sovellus laskee:
 
@@ -13,13 +13,6 @@ Tämä sovellus hakee Bitcoinin markkinadataa CoinGeckosta ja näyttää sen ver
 - Chart.js frontend-grafiikka
 - Ei tietokantaa
 - Haetut tiedot tulevat CoinGeckon julkisesta API:sta
-
-## Asennus
-
-backendin terminaalisss run
-python -m uvicorn main:app --reload
-ja sitten
-Avaa `frontend/index.html` selaimessa.
 
 ## Käyttö
 
