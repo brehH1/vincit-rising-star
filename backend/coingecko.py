@@ -1,25 +1,30 @@
-import datetime as dt
+import os
 import requests
 
-def fetch_range(start, end, coin_id, currency):
-    s = dt.datetime.combine(start, dt.time(0, 0), tzinfo=dt.timezone.utc)
-    e = dt.datetime.combine(end + dt.timedelta(days=1), dt.time(1, 0), tzinfo=dt.timezone.utc)
-    url = "https://api.coingecko.com/api/v3/coins/" + coin_id + "/market_chart/range"
-    r = requests.get(url, params={
-        "vs_currency": currency,
-        "from": int(s.timestamp()),
-        "to": int(e.timestamp())
-    })
+API_KEY = os.getenv("CG_API_KEY")
+
+def fetch_range(start_ts, end_ts, coin, currency):
+    url = (
+        f"https://api.coingecko.com/api/v3/coins/{coin}/market_chart/range"
+        f"?vs_currency={currency}&from={start_ts}&to={end_ts}"
+    )
+
+    headers = {
+        "x-cg-demo-api-key": API_KEY
+    }
+
+    r = requests.get(url, headers=headers, timeout=10)
     r.raise_for_status()
-    d = r.json()
-    prices = d.get("prices", [])
-    vols = d.get("total_volumes", [])
-    vd = {ts: v for ts, v in vols}
-    out = []
-    for ts, p in prices:
-        out.append({
-            "timestamp": ts,
-            "price": p,
-            "volume": vd.get(ts, 0.0)
-        })
-    return out
+    data = r.json()
+
+    prices = data.get("prices", [])
+    volumes = data.get("total_volumes", [])
+
+    return [
+        {
+            "date": p[0] // 1000,
+            "price": p[1],
+            "volume": volumes[i][1] if i < len(volumes) else 0
+        }
+        for i, p in enumerate(prices)
+    ]
