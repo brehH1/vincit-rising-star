@@ -1,6 +1,6 @@
 # Bitcoin-analyysisovellus
 
-Tämä sovellus hakee Bitcoinin markkinadataa CoinGeckon rajapinnasta ja näyttää sen selkeänä verkkosivuna, jossa on pylväsdiagrammeja ja tilastoja. Käyttäjä voi valita päivämäärävälin, jonka perusteella sovellus laskee:
+Tämä sovellus hakee Bitcoinin markkinadataa CoinGeckosta ja näyttää sen verkkosivuna, jossa on diagrammeja ja tilastoja. Käyttäjä voi valita päivämäärävälin, jonka perusteella sovellus laskee:
 
 1. Pisimmän laskutrendin pituus päivinä
 2. Päivämäärän, jolloin volyymi oli suurin
@@ -16,9 +16,9 @@ Tämä sovellus hakee Bitcoinin markkinadataa CoinGeckon rajapinnasta ja näytt�
 
 ## Asennus
 
-Backend:
-Frontend:
-
+backendin terminaalisss run
+python -m uvicorn main:app --reload
+ja sitten
 Avaa `frontend/index.html` selaimessa.
 
 ## Käyttö
@@ -26,7 +26,7 @@ Avaa `frontend/index.html` selaimessa.
 1. Aseta alku- ja loppupäivä sivun yläreunassa
 2. Paina Hae
 3. Sivulle päivittyvät:
-   - Pylväsdiagrammit
+   - Diagrammit
    - Laskutrendi
    - Suurin volyymipäivä
    - Paras osto- ja myyntipäivä
@@ -34,3 +34,4 @@ Avaa `frontend/index.html` selaimessa.
 ## Huomio
 
 CoinGecko rajoittaa pyyntöjen määrää. Suuria date range -hakuja kannattaa välttää.
+

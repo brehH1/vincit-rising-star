@@ -13,6 +13,23 @@ function toggleTheme() {
     localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
 }
 
+function formatNumber(value) {
+    if (value === null || value === undefined) return "-";
+
+    const abs = Math.abs(value);
+
+    if (abs >= 1_000_000_000)
+        return (value / 1_000_000_000).toFixed(2) + "mrd";
+
+    if (abs >= 1_000_000)
+        return (value / 1_000_000).toFixed(2) + "m";
+
+    if (abs >= 1_000)
+        return (value / 1_000).toFixed(2) + "t";
+
+    return value.toFixed(2);
+}
+
 async function loadData() {
     const s = document.getElementById("start").value;
     const e = document.getElementById("end").value;
@@ -22,25 +39,36 @@ async function loadData() {
 
     document.getElementById("statsBox").textContent =
         "Pisin laskutrendi: " + d.bearish.length + " päivää\n" +
-        "Suurin volyymi: " + d.max_volume.date + " (" + d.max_volume.volume + ")\n" +
+        "Suurin volyymi: " + d.max_volume.date + " (" + formatNumber(d.max_volume.volume) + " EUR)\n" +
         "Paras osto/myynti: " + d.best_trade.buy + " → " + d.best_trade.sell +
-        " (tuotto " + d.best_trade.profit + ")";
+        " (tuotto " + formatNumber(d.best_trade.profit) + " EUR)";
 
     const labels = d.candles.map(c => c.date);
-    const prices = d.candles.map(c => c.price);
-    const volumes = d.candles.map(c => c.volume);
+    const prices = d.candles.map(c => Number(c.price.toFixed(2)));
+    const volumes = d.candles.map(c => Number(c.volume.toFixed(2)));
 
     if (priceChart) priceChart.destroy();
     if (volumeChart) volumeChart.destroy();
 
     priceChart = new Chart(document.getElementById("priceChart"), {
-        type: "bar",
+        type: "line",
         data: {
             labels: labels,
             datasets: [{
                 label: "Hinta (EUR)",
                 data: prices
             }]
+        },
+        options: {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return formatNumber(ctx.raw) + " EUR";
+                        }
+                    }
+                }
+            }
         }
     });
 
@@ -52,6 +80,17 @@ async function loadData() {
                 label: "Volyymi (EUR)",
                 data: volumes
             }]
+        },
+        options: {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return formatNumber(ctx.raw) + " EUR";
+                        }
+                    }
+                }
+            }
         }
     });
 }
