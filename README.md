@@ -1,4 +1,5 @@
 # Bitcoin-analyysiohjelma
+https://vincit-rising-star-frontend-production.up.railway.app/
 
 Tämä sovellus hakee Bitcoinin markkinadataa CoinGeckosta ja näyttää sen verkkosivuna, jossa on diagrammeja ja tilastoja. Käyttäjä voi valita päivämäärävälin, jonka perusteella sovellus laskee:
 
