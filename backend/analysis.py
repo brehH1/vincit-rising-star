@@ -1,71 +1,78 @@
-import datetime as dt
-
-def group(points):
-    days = {}
-    for p in points:
-        t = dt.datetime.utcfromtimestamp(p["timestamp"] / 1000).date()
-        days.setdefault(t, []).append(p)
-    out = []
-    for day in sorted(days.keys()):
-        ps = sorted(days[day], key=lambda x: x["timestamp"])
-        out.append({
-            "date": day.isoformat(),
-            "price": ps[0]["price"],
-            "volume": ps[-1]["volume"]
-        })
-    return out
-
-def bearish(candles):
+def longest_bearish(candles):
     if not candles:
         return {"length": 0, "start": None, "end": None}
-    ml = 0
-    ms = 0
-    cl = 0
-    cs = 0
-    for i in range(1, len(candles)):
-        if candles[i]["price"] < candles[i-1]["price"]:
-            if cl == 0:
-                cs = i-1
-            cl += 1
+
+    best_len = 0
+    best_start = None
+    best_end = None
+
+    current_len = 0
+    current_start = None
+    prev_price = candles[0]["price"]
+    prev_date = candles[0]["date"]
+
+    for c in candles[1:]:
+        price = c["price"]
+        date = c["date"]
+
+        if price < prev_price:
+            if current_len == 0:
+                current_start = prev_date
+            current_len += 1
+            if current_len > best_len:
+                best_len = current_len
+                best_start = current_start
+                best_end = date
         else:
-            if cl > ml:
-                ml = cl
-                ms = cs
-            cl = 0
-    if cl > ml:
-        ml = cl
-        ms = cs
-    if ml == 0:
-        return {"length": 0, "start": None, "end": None}
+            current_len = 0
+            current_start = None
+
+        prev_price = price
+        prev_date = date
+
     return {
-        "length": ml,
-        "start": candles[ms]["date"],
-        "end": candles[ms+ml]["date"]
+        "length": best_len,
+        "start": best_start,
+        "end": best_end,
     }
 
-def max_volume(candles):
+
+def highest_volume(candles):
     if not candles:
-        return {"date": None, "volume": 0}
+        return {"date": None, "volume": 0.0}
     m = max(candles, key=lambda c: c["volume"])
-    return {"date": m["date"], "volume": m["volume"]}
+    return {"date": m["date"], "volume": float(m["volume"])}
+
 
 def best_trade(candles):
-    if len(candles) < 2:
-        return {"buy": None, "sell": None, "profit": 0}
-    mp = candles[0]["price"]
-    md = candles[0]["date"]
-    bp = 0
-    bd = None
-    sd = None
+    if not candles:
+        return {"buy": None, "sell": None, "profit": 0.0}
+
+    min_price = candles[0]["price"]
+    min_date = candles[0]["date"]
+    best_profit = 0.0
+    best_buy = None
+    best_sell = None
+
     for c in candles[1:]:
-        pr = c["price"] - mp
-        if pr > bp:
-            bp = pr
-            bd = md
-            sd = c["date"]
-        if c["price"] < mp:
-            mp = c["price"]
-            md = c["date"]
-    if bp <= 0:
-        return {"buy": None, "sell": None, "profit": 0}
-    return {"buy": bd, "sell": sd, "profit": bp}
+        price = c["price"]
+        date = c["date"]
+
+        profit = price - min_price
+        if profit > best_profit:
+            best_profit = profit
+            best_buy = min_date
+            best_sell = date
+
+        if price < min_price:
+            min_price = price
+            min_date = date
+
+    if best_profit <= 0:
+        return {"buy": None, "sell": None, "profit": 0.0}
+
+    return {
+        "buy": best_buy,
+        "sell": best_sell,
+        "profit": float(round(best_profit, 2)),
+    }
